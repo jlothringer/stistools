@@ -189,10 +189,10 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
         in_hdul[0].header['DELAYCOR'] = "PERFORM"
 
         # COS has no TEXPSTRT in primary header, so use EXPSTART in first ext
-        if in_hdul[0].header['INSTRUME'] == "STIS": 
+        if in_hdul[0].header['INSTRUME'] == "STIS":
             mjd1 = in_hdul[0].header['TEXPSTRT']
             mjd2 = in_hdul[0].header['TEXPEND']
-        elif in_hdul[0].header['INSTRUME'] == "COS": 
+        elif in_hdul[0].header['INSTRUME'] == "COS":
             mjd1 = in_hdul[1].header['EXPSTART']
             mjd2 = in_hdul[1].header['EXPEND']
         else:
@@ -295,7 +295,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
                 delta_sec = calc_delay_orbfile(epoch_array, ra, dec, hst_orb, distance=distance)
 
             # This is correcting for the difference between the new time interval
-            # and the *corrected* exposure start time 
+            # and the *corrected* exposure start time
             # (i.e., the add'l correction now that the Earth and HST have moved)
             time_array = time_array + (delta_sec - t0_delay).value * SECPERDAY
 
@@ -363,12 +363,12 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
         # IF STIS
         # add delaytime to TEXPSTRT and TEXPEND, and update primary header
         # COS has no TEXPSTRT in primary header
-        if in_hdul[0].header['INSTRUME'] == "STIS": 
+        if in_hdul[0].header['INSTRUME'] == "STIS":
             mjd1 = in_hdul[0].header['TEXPSTRT']
             if hst_orb is None:
                 delta_sec = calc_delay_jpl(mjd1, ra, dec, distance=distance)
             else:
-                delta_sec = calc_delay_orbfile(mjd1, ra, dec, hst_orb, 
+                delta_sec = calc_delay_orbfile(mjd1, ra, dec, hst_orb,
                                                distance=distance)
 
             in_hdul[0].header['TEXPSTRT'] = mjd1 + delta_sec.value
@@ -377,7 +377,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
             if hst_orb is None:
                 delta_sec = calc_delay_jpl(mjd2, ra, dec, distance=distance)
             else:
-                delta_sec = calc_delay_orbfile(mjd2, ra, dec, hst_orb, 
+                delta_sec = calc_delay_orbfile(mjd2, ra, dec, hst_orb,
                                                distance=distance)
             in_hdul[0].header['TEXPEND'] = mjd2 + delta_sec.value
 
@@ -605,13 +605,13 @@ def calc_delay_jpl(times, ra, dec, distance=1e9, verbose=True):
         #correction_term = ((-0.5 / distance) *
         #                   (np.sum((np.array(hstbary))**2) -
         #                    (np.dot(target_arr, hstbary))**2) * u.AU /
-        #                   c.c).to('day') 
+        #                   c.c).to('day')
 
         # Actually just need to make the above sum over the correction axis
         correction_term = ((-0.5 / distance) *
                           (np.sum((np.array(hstbary))**2, axis=0) -
                             (np.dot(target_arr, hstbary))**2) * u.AU /
-                          c.c).to('day') 
+                          c.c).to('day')
 
         if verbose:
             if correction_term.size < 10:
@@ -820,7 +820,7 @@ def calc_delay_orbfile(times, ra, dec, hst_orb, distance=1e9, verbose=True, in_c
     return lt_time
 
 
-def odelay_file_compare(file1, file2, in_col='TIME'):
+def odelay_file_compare(file1, file2):
     """
     Compare timing information between two FITS files.
 
@@ -834,9 +834,6 @@ def odelay_file_compare(file1, file2, in_col='TIME'):
         Path to the first FITS file.
     file2 : str
         Path to the second FITS file to compare against file1.
-    in_col : str, optional
-        Name of the column containing time data in the FITS table.
-        Default is 'TIME'.
 
     Returns
     -------
@@ -876,15 +873,14 @@ def odelay_file_compare(file1, file2, in_col='TIME'):
     # IF STIS
     # add delaytime to TEXPSTRT and TEXPEND, and update primary header
     # COS has no TEXPSTRT in primary header
-    if x[0].header['INSTRUME'] == "STIS": 
-        #print(f"TEXPSTRT file2-file1: {x2[0].header['TEXPSTRT']-x[0].header['TEXPSTRT']} days")
-        print(f"TEXPSTRT file2-file1 {(x2[0].header['TEXPSTRT']-x[0].header['TEXPSTRT'])*24*60*60} seconds")
+    if x[0].header['INSTRUME'] == "STIS":
+        print(f"TEXPSTRT file2-file1 {(x2[0].header['TEXPSTRT'] - x[0].header['TEXPSTRT']) * 24 * 60 * 60} seconds")
 
-    if x[0].header['INSTRUME'] == "STIS": 
-        t = T.Time(x[0].header['TEXPSTRT'],format='mjd',scale='utc')
-    elif x[0].header['INSTRUME'] == "COS": 
-        t = T.Time(x[1].header['EXPSTART'],format='mjd',scale='utc')
+    if x[0].header['INSTRUME'] == "STIS":
+        t = Time(x[0].header['TEXPSTRT'], format='mjd', scale='utc')
+    elif x[0].header['INSTRUME'] == "COS":
+        t = Time(x[1].header['EXPSTART'], format='mjd', scale='utc')
     else:
-        raise ValueError(f'Unexpected INSTRUME value: {x[1].header['EXPSTART']}')
-    diff = (t.tdb.value - t.tt.value)*24*60*60
+        raise ValueError(f"Unexpected INSTRUME value: {x[1].header['EXPSTART']}")
+    diff = (t.tdb.value - t.tt.value) * 24 * 60 * 60
     print(f'In case it is helpful, the difference between TT and TDB_BJD is {diff:.6f} s')
