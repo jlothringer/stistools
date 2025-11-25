@@ -867,20 +867,19 @@ def odelay_file_compare(file1, file2):
     In case it is helpful, the difference between TT and TDB_BJD is -0.001497 s
     """
 
-    x = fits.open(file1)
-    x2 = fits.open(file2)
+    with fits.open(file1) as f1, fits.open(file2) as f2:
+        # IF STIS
+        # add delaytime to TEXPSTRT and TEXPEND, and update primary header
+        # COS has no TEXPSTRT in primary header
+        if f1[0].header['INSTRUME'] == "STIS":
+            print(f"TEXPSTRT file2-file1 {(f2[0].header['TEXPSTRT'] - f1[0].header['TEXPSTRT']) * 24 * 60 * 60} seconds")
+    
+        if f1[0].header['INSTRUME'] == "STIS":
+            t = Time(f1[0].header['TEXPSTRT'], format='mjd', scale='utc')
+        elif f1[0].header['INSTRUME'] == "COS":
+            t = Time(f1[1].header['EXPSTART'], format='mjd', scale='utc')
+        else:
+            raise ValueError(f"Unexpected INSTRUME value: {f1[1].header['EXPSTART']}")
 
-    # IF STIS
-    # add delaytime to TEXPSTRT and TEXPEND, and update primary header
-    # COS has no TEXPSTRT in primary header
-    if x[0].header['INSTRUME'] == "STIS":
-        print(f"TEXPSTRT file2-file1 {(x2[0].header['TEXPSTRT'] - x[0].header['TEXPSTRT']) * 24 * 60 * 60} seconds")
-
-    if x[0].header['INSTRUME'] == "STIS":
-        t = Time(x[0].header['TEXPSTRT'], format='mjd', scale='utc')
-    elif x[0].header['INSTRUME'] == "COS":
-        t = Time(x[1].header['EXPSTART'], format='mjd', scale='utc')
-    else:
-        raise ValueError(f"Unexpected INSTRUME value: {x[1].header['EXPSTART']}")
     diff = (t.tdb.value - t.tt.value) * 24 * 60 * 60
     print(f'In case it is helpful, the difference between TT and TDB_BJD is {diff:.6f} s')
