@@ -324,7 +324,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
             if time_system == 'UTC':
                 events_tab.header['EXPSTART'] = mjd1 + delta_sec.value
             elif time_system == 'TDB':
-                mjd1_obj = T.Time(mjd1, format = 'mjd', scale='utc')  
+                mjd1_obj = Time(mjd1, format = 'mjd', scale='utc')  
                 events_tab.header['EXPSTART'] = mjd1_obj.tdb.value + delta_sec.value
 
             # DOUBLE CHECK FOR TYPO, should probably be mjd2
@@ -338,7 +338,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
             if time_system == 'UTC':
                 events_tab.header['EXPEND'] = mjd2 + delta_sec.value
             elif time_system == 'TDB':
-                mjd2_obj = T.Time(mjd2, format = 'mjd', scale='utc')  
+                mjd2_obj = Time(mjd2, format = 'mjd', scale='utc')  
                 events_tab.header['EXPEND'] = mjd2_obj.tdb.value + delta_sec.value
 
             in_hdul.flush()
@@ -369,7 +369,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
                 if time_system == 'UTC':
                     cur_tab.header['EXPSTART'] = mjd1 + delta_sec.value
                 elif time_system == 'TDB':
-                    mjd1_obj = T.Time(mjd1, format = 'mjd', scale='utc')  
+                    mjd1_obj = Time(mjd1, format = 'mjd', scale='utc')  
                     cur_tab.header['EXPSTART'] = mjd1_obj.tdb.value + delta_sec.value
                     
                 modified = True
@@ -386,7 +386,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
                 if time_system == 'UTC':
                     cur_tab.header['EXPEND'] = mjd2 + delta_sec.value
                 elif time_system == 'TDB':
-                    mjd2_obj = T.Time(mjd2, format = 'mjd', scale='utc') 
+                    mjd2_obj = Time(mjd2, format = 'mjd', scale='utc') 
                     cur_tab.header['EXPEND'] = mjd2_obj.tdb.value + delta_sec.value
                 modified = True
 
@@ -415,7 +415,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
             if time_system == 'UTC':
                 in_hdul[0].header['TEXPSTRT'] = mjd1 + delta_sec.value
             elif time_system == 'TDB':
-                mjd1_obj = T.Time(mjd1, format = 'mjd', scale='utc') 
+                mjd1_obj = Time(mjd1, format = 'mjd', scale='utc') 
                 in_hdul[0].header['TEXPSTRT'] = mjd1_obj.tdb.value + delta_sec.value
                     
             mjd2 = in_hdul[0].header['TEXPEND']
@@ -430,7 +430,7 @@ def barycentric_correction(table_names, verbose=True, distance=1e9,
             if time_system == 'UTC':
                 in_hdul[0].header['TEXPEND'] = mjd2 + delta_sec.value
             elif time_system == 'TDB':
-                mjd2_obj = T.Time(mjd2, format = 'mjd', scale='utc') 
+                mjd2_obj = Time(mjd2, format = 'mjd', scale='utc') 
                 in_hdul[0].header['TEXPEND'] = mjd2_obj.tdb.value + delta_sec.value
 
         # add keyword to flag the fact that the times have been corrected
