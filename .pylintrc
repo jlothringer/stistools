@@ -1,0 +1,2 @@
+[TYPECHECK]
+ignored-modules=astropy.constants, astropy.units, astropy.io, astropy.coordinates, astroquery.jplhorizons
